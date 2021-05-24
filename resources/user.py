@@ -1,4 +1,5 @@
 from typing import Any, Union
+from flask import request
 from werkzeug.security import safe_str_cmp
 from flask_jwt_extended import (
     create_access_token,
@@ -7,9 +8,11 @@ from flask_jwt_extended import (
     jwt_required,
     get_jwt,
 )
-from flask_restful import Resource, reqparse
+from flask_restful import Resource
 from blacklist import BLACKLIST
 
+from marshmallow import ValidationError
+from schemas.user import UserSchema
 from models.user import UserModel, UserModelType
 
 BLANK_ERROR = "'{}' cannot be blank."
@@ -20,32 +23,22 @@ USER_DELETED = "User deleted."
 INVALID_CREDENTIALS = "Invalid credentials!"
 USER_LOGGED_OUT = "User <id={user_id}> successfully lodded out."
 
-JSONResponseType = tuple[dict[str, Any], int]
+JSONResponseType = tuple[Union[dict[str, Any], Any], int]
 
-_user_parser = reqparse.RequestParser()
-_user_parser.add_argument(
-    "username",
-    type=str,
-    required=True,
-    help=BLANK_ERROR.format('username'),
-)
-_user_parser.add_argument(
-    "password",
-    type=str,
-    required=True,
-    help=BLANK_ERROR.format('password'),
-)
-
+user_schema = UserSchema()
 
 class UserRegister(Resource):
     @classmethod
     def post(cls) -> JSONResponseType:
-        data: dict[str, str] = _user_parser.parse_args()
+        try:
+            user: UserModel = user_schema.load(request.get_json())
+        except ValidationError as err:
+            return err.messages, 400
 
-        if UserModel.find_by_username(data["username"]):
+        if UserModel.find_by_username(user.username):
             return {"error_message": USER_ALREADY_EXISTS}, 400
 
-        user = UserModel(**data)
+        # user = UserModel(**user_data)
         user.save_to_db()
 
         return {"message": CREATED_SUCCESSFULLY}, 201
@@ -57,7 +50,7 @@ class User(Resource):
         user = UserModel.find_by_id(user_id)
         if not user:
             return {"error_message": USER_NOT_FOUND}, 404
-        return user.json()
+        return user_schema.dump(user), 200
 
     @classmethod
     def delete(cls, user_id: int) -> JSONResponseType:
@@ -71,14 +64,16 @@ class User(Resource):
 class UserLogin(Resource):
     @classmethod
     def post(cls) -> JSONResponseType:
-        # get data from parser
-        data: dict[str, str] = _user_parser.parse_args()
+        try:
+            user_data: UserModel = user_schema.load(request.get_json())
+        except ValidationError as err:
+            return err.messages, 400
 
         # find user in database
-        user = UserModel.find_by_username(data["username"])
+        user = UserModel.find_by_username(user_data.username)
 
         # This is what the authenticate() dunction used to
-        if user and safe_str_cmp(user.password, data["password"]):
+        if user and safe_str_cmp(user.password, user_data.password):
             # create access token
             access_token = create_access_token(identity=user.id, fresh=True)
             # create refresh token

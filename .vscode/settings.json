@@ -6,11 +6,12 @@
     "python.analysis.diagnosticSeverityOverrides": {
         "reportUnknownMemberType": "warning",
         "reportUntypedFunctionDecorator": "warning",
+        "reportUnknownVariableType": "warning",
+        "reportUnknownArgumentType": "warning"
     },
     "python.formatting.provider": "black",
     "python.analysis.extraPaths": [
-        "${workspaceFolder}",
-        "${workspaceFolder}\\venv\\Lib\\site-packages",
+        "C:\\Users\\Kaiser\\.virtualenvs\\udemy-advanced-restapi-flask-python-YiY2U8V4\\Lib\\site-packages",
     ],
     "python.linting.pylintUseMinimalCheckers": false,
 

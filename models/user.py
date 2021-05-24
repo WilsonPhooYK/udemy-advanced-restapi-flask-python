@@ -18,16 +18,13 @@ class UserModel(Model):
     __tablename__ = "users"
     # Must have id to authenticate
     id: int = db.Column(db.Integer, primary_key=True)
-    username: str = db.Column(db.String(80))
-    password: str = db.Column(db.String(80))
+    username: str = db.Column(db.String(80), nullable=False, unique=True)
+    password: str = db.Column(db.String(80), nullable=False)
 
-    def __init__(self, username: str, password: str) -> None:
-        # Must have id to authenticate
-        self.username = username
-        self.password = password
-
-    def json(self) -> UserModelType:
-        return {"id": self.id, "username": self.username}
+    # def __init__(self, username: str, password: str) -> None:
+    #     # Must have id to authenticate
+    #     self.username = username
+    #     self.password = password
 
     @classmethod
     def find_by_username(cls, username: str) -> "UserModel":

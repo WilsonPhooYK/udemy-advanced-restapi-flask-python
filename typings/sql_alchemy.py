@@ -1,7 +1,6 @@
 from typing import Any
 from flask_sqlalchemy import SQLAlchemy as SQLAlchemyBase, Model as ModelBase
 
-
 class QueryModel:
     add_column: Any = ...
     add_columns: Any = ...
