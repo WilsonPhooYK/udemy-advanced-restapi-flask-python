@@ -5,6 +5,7 @@ from typing import Any, cast
 from flask import Flask, jsonify
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
+from marshmallow import ValidationError
 
 from ma import ma
 from db import db
@@ -30,6 +31,10 @@ api = Api(app)
 # app.config['JWT_EXPIRATION_DELTA'] = timedelta(seconds=1800)
 # app.config['JWT_AUTH_USERNAME_KEY'] = 'email'
 jwt = JWTManager(app)  # not creating /auth
+
+@app.errorhandler(ValidationError)
+def handle_marshmallow_validation(err: Any) -> Any: # except ValidationError as err
+    return jsonify(err.message), 400
 
 # Run this whenever a new JWT is created
 @jwt.additional_claims_loader

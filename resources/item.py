@@ -1,9 +1,11 @@
-from flask_restful import Resource, reqparse
+from flask_restful import Resource
+from flask import request
 from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
 from typing import Any, Union
-from models.item import ItemModel, ItemModelType
+from models.item import ItemModel
 
-BLANK_ERROR = "'{}' cannot be blank."
+from schemas.item import ItemSchema
+
 NAME_ALREADY_EXISTS = "An item with name '{}' already exists."
 ERROR_INSERTING = "An error occurred while inserting the item."
 ITEM_NOT_FOUND = "Item not found."
@@ -11,6 +13,8 @@ ITEM_DELETED = "Item deleted."
 ADMIN_REQUIRED = "Admin privilege required."
 MORE_DATA_AVAILABLE = "More data available if you login"
 
+item_schema = ItemSchema()
+item_list_schema = ItemSchema(many=True)
 
 JSONResponseType = tuple[dict[str, str], int]
 # JWT - JSON Web Token
@@ -20,20 +24,12 @@ JSONResponseType = tuple[dict[str, str], int]
 # 201 - create success
 # 202 - accepted, but will create success only after a long time
 class Item(Resource):
-    parser = reqparse.RequestParser()
-    parser.add_argument(
-        "price", type=float, required=True, help=BLANK_ERROR.format('price')
-    )
-    parser.add_argument(
-        "store_id", type=int, required=True, help=BLANK_ERROR.format('store_id')
-    )
-
     # Authorization - JWT {token}
     @classmethod
-    def get(cls, name: str) -> Union[ItemModelType, JSONResponseType]:
+    def get(cls, name: str) -> Union[Any, JSONResponseType]:
         item = ItemModel.find_by_name(name)
         if item:
-            return item.json()
+            return item_schema.dump(item)
 
         return {"error_message": ITEM_NOT_FOUND}, 404
 
@@ -41,13 +37,15 @@ class Item(Resource):
     # return {"error_message": "Item not found"}, 404
     @classmethod
     @jwt_required(fresh=True)
-    def post(cls, name: str) -> Union[tuple[ItemModelType, int], JSONResponseType]:
+    def post(cls, name: str) -> Union[tuple[Any, int], JSONResponseType]:
         if ItemModel.find_by_name(name):
             return {"message": NAME_ALREADY_EXISTS.format(name)}, 400
 
         # Only parse for price
-        data: ItemModelType = Item.parser.parse_args()
-        item = ItemModel(name, data["price"], data["store_id"])
+        item_json = request.get_json()
+        item_json["name"] = name
+
+        item: ItemModel = item_schema.load(item_json)
 
         try:
             item.save_to_db()
@@ -56,7 +54,7 @@ class Item(Resource):
                 "error_message": ERROR_INSERTING
             }, 500  # Internal Server Error
 
-        return item.json(), 201
+        return item_schema.dump(item), 201
 
     @classmethod
     @jwt_required()
@@ -75,19 +73,22 @@ class Item(Resource):
         return {"message": ITEM_DELETED}, 200
 
     @classmethod
-    def put(cls, name: str) -> Union[tuple[ItemModelType, int], JSONResponseType]:
-        # Only parse for price
-        data: ItemModelType = Item.parser.parse_args()
-        item = ItemModel(name, data["price"], data["store_id"])
+    def put(cls, name: str) -> Union[tuple[Any, int], JSONResponseType]:
+        item_json = request.get_json()
+        item: Union[ItemModel, None] = ItemModel.find_by_name(name)
 
-        if ItemModel.find_by_name(name):
-            item = ItemModel(name, data["price"], data["store_id"])
+        if item:
+            item.price = item_json["price"]
         else:
-            item.price = data["price"]
+            item_json["name"] = name
+            item: Union[ItemModel, None] = item_schema.load(item_json)
 
-        item.save_to_db()
+        if item:
+            item.save_to_db()
 
-        return item.json(), 200
+            return item_schema.dump(item), 200
+        
+        return {"message": ITEM_NOT_FOUND}, 400
 
 
 class ItemList(Resource):
@@ -95,7 +96,7 @@ class ItemList(Resource):
     @jwt_required(optional=True)
     def get(cls) -> tuple[Any, int]:
         user_id = get_jwt_identity()
-        items = [item.json() for item in ItemModel.find_all()]
+        items = item_list_schema.dump(ItemModel.find_all())
 
         if user_id:
             return items, 200

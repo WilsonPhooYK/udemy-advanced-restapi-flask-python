@@ -20,26 +20,12 @@ class ItemModel(Model):
     __tablename__ = "items"
 
     id: int = db.Column(db.Integer, primary_key=True)
-    name: str = db.Column(db.String(80), unique=True)
-    price: float = db.Column(db.Float(precision=2))
+    name: str = db.Column(db.String(80), nullable=False, unique=True)
+    price: float = db.Column(db.Float(precision=2), nullable=False)
 
-    store_id = db.Column(db.Integer, db.ForeignKey("stores.id"))
+    store_id = db.Column(db.Integer, db.ForeignKey("stores.id"), nullable=False)
     # Matches store_id to Store
     store = db.relationship("StoreModel")
-
-    def __init__(self, name: str, price: float, store_id: int) -> None:
-        # Must have id to authenticate
-        self.name = name
-        self.price = price
-        self.store_id = store_id
-
-    def json(self) -> ItemModelType:
-        return {
-            "id": self.id,
-            "name": self.name,
-            "price": self.price,
-            "store_id": self.store_id,
-        }
 
     @classmethod
     def find_by_name(cls, name: str) -> Optional["ItemModel"]:
