@@ -1,0 +1,9 @@
+.full-height {
+    height: 80vh;
+    margin: 10px;
+    background-color: aquamarine;
+}
+
+body {
+    background-color: red;
+}

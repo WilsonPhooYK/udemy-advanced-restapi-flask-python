@@ -27,7 +27,7 @@ class StoreModel(Model):
     # lazy = dynamic makes items become a query builder, so as not
     # to create all the items from the start, but we need to call it everytime in
     # the json method
-    items: QueryModel = db.relationship("ItemModel", lazy="dynamic")
+    items: QueryModel = db.relationship("ItemModel", lazy="dynamic", viewonly=True)
 
     @classmethod
     def find_by_name(cls, name: str) -> Optional["StoreModel"]:

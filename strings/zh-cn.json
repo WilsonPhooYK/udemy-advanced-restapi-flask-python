@@ -1,0 +1,33 @@
+{
+    "mailgun_failed_load_api_key": "Chinese: Failed to load MailGun API key.",
+    "mailgun_failed_load_domain": "Chinese: Failed to load MailGun domain.",
+    "mailgun_error_send_email": "Chinese: Error in sending confirmation email, user registration failed.",
+  
+    "confirmation_not_found": "Chinese: Confirmation reference not found.",
+    "confirmation_link_expired": "Chinese: The link has expired.",
+    "confirmation_already_confirmed": "Chinese: Registration has already been confirmed.",
+    "confirmation_resend_fail": "Chinese: Internal server error. Failed to resend confirmation email.",
+    "confirmation_resend_successful": "Chinese: E-mail confirmation successfully re-sent.",
+  
+    "item_name_exists": "Chinese: An item with name '{}' already exists.",
+    "item_error_inserting": "Chinese: An error occurred while inserting the item.",
+    "item_not_found": "Chinese: Item not found.",
+    "item_deleted": "Chinese: Item deleted.",
+    "item_more_available": "Chinese: More data available if you login",
+  
+    "store_name_exists": "Chinese: A store with name '{}' already exists.",
+    "store_error_inserting": "Chinese: An error occurred while inserting the store.",
+    "store_not_found": "Chinese: Store not found.",
+    "store_deleted": "Chinese: Store deleted.",
+  
+    "user_username_exists": "Chinese: A user with that username already exists.",
+    "user_email_exists": "Chinese: A user with that email already exists.",
+    "user_not_found": "Chinese: User not found.",
+    "user_deleted": "Chinese: User deleted.",
+    "user_invalid_credentials": "Chinese: Invalid credentials!",
+    "user_logged_out": "Chinese: User <id={user_id}> successfully logged out.",
+    "user_not_confirmed": "Chinese: You have not confirmed registration, please check your email <{}>.",
+    "user_error_creating": "Chinese: Internal server error. Failed to create user.",
+    "user_registered": "Chinese: Account created successfully, an email with an activation link has been sent to your email address, please check.",
+    "user_admin_required": "Chinese: Admin privilege required."
+  }

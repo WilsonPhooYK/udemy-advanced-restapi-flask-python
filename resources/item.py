@@ -2,16 +2,10 @@ from flask_restful import Resource
 from flask import request
 from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
 from typing import Any, Union
+
+from libs.strings import gettext
 from models.item import ItemModel
-
 from schemas.item import ItemSchema
-
-NAME_ALREADY_EXISTS = "An item with name '{}' already exists."
-ERROR_INSERTING = "An error occurred while inserting the item."
-ITEM_NOT_FOUND = "Item not found."
-ITEM_DELETED = "Item deleted."
-ADMIN_REQUIRED = "Admin privilege required."
-MORE_DATA_AVAILABLE = "More data available if you login"
 
 item_schema = ItemSchema()
 item_list_schema = ItemSchema(many=True)
@@ -31,7 +25,7 @@ class Item(Resource):
         if item:
             return item_schema.dump(item)
 
-        return {"error_message": ITEM_NOT_FOUND}, 404
+        return {"error_message": gettext("item_not_found")}, 404
 
     # except StopIteration:
     # return {"error_message": "Item not found"}, 404
@@ -39,7 +33,7 @@ class Item(Resource):
     @jwt_required(fresh=True)
     def post(cls, name: str) -> Union[tuple[Any, int], JSONResponseType]:
         if ItemModel.find_by_name(name):
-            return {"message": NAME_ALREADY_EXISTS.format(name)}, 400
+            return {"message": gettext("item_name_exists").format(name)}, 400
 
         # Only parse for price
         item_json = request.get_json()
@@ -50,9 +44,7 @@ class Item(Resource):
         try:
             item.save_to_db()
         except:
-            return {
-                "error_message": ERROR_INSERTING
-            }, 500  # Internal Server Error
+            return {"error_message": gettext("item_error_inserting")}, 500  # Internal Server Error
 
         return item_schema.dump(item), 201
 
@@ -62,15 +54,15 @@ class Item(Resource):
         # Get claims from jwt
         claims = get_jwt()
         if not claims.get("is_admin"):
-            return {"message": ADMIN_REQUIRED}, 401
+            return {"message": gettext("user_admin_required")}, 401
 
         item = ItemModel.find_by_name(name)
         if not item:
-            return {"message": ITEM_NOT_FOUND}, 400
+            return {"message": gettext("item_not_found")}, 400
 
         item.delete_from_db()
 
-        return {"message": ITEM_DELETED}, 200
+        return {"message": gettext("item_deleted")}, 200
 
     @classmethod
     def put(cls, name: str) -> Union[tuple[Any, int], JSONResponseType]:
@@ -87,8 +79,8 @@ class Item(Resource):
             item.save_to_db()
 
             return item_schema.dump(item), 200
-        
-        return {"message": ITEM_NOT_FOUND}, 400
+
+        return {"message": gettext("item_not_found")}, 400
 
 
 class ItemList(Resource):
@@ -103,7 +95,7 @@ class ItemList(Resource):
 
         return {
             "items": [item["name"] for item in items],
-            "messsage": MORE_DATA_AVAILABLE,
+            "messsage": gettext("item_more_available"),
         }, 200
         # return list(map(lambda item: item.json(), ItemModel.query.all())), 200
         # return [item.json() for item in ItemModel.find_all()], 200

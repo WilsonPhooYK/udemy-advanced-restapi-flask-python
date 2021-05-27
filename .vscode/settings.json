@@ -7,7 +7,8 @@
         "reportUnknownMemberType": "warning",
         "reportUntypedFunctionDecorator": "warning",
         "reportUnknownVariableType": "warning",
-        "reportUnknownArgumentType": "warning"
+        "reportUnknownArgumentType": "warning",
+        "reportMissingTypeStubs": "error",
     },
     "python.formatting.provider": "black",
     "python.analysis.extraPaths": [
