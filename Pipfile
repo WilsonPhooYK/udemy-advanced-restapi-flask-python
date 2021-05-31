@@ -20,6 +20,7 @@ flask-uploads = "*"
 werkzeug = "==0.16.0"
 psycopg2-binary = "*"
 flask-migrate = "*"
+flask-oauthlib = "*"
 
 [dev-packages]
 black = "==21.5b1"

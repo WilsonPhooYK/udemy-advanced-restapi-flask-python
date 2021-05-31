@@ -8,3 +8,5 @@ venv
 .png
 .svg
 .jpeg
+
+data.db

@@ -30,6 +30,7 @@
     "user_error_creating": "Internal server error. Failed to create user.",
     "user_registered": "Account created successfully, an email with an activation link has been sent to your email address, please check.",
     "user_admin_required": "Admin privilege required.",
+    "user_password_updated": "user password updated successfully.",
 
     "image_uploaded": "Image '{}' uploaded.",
     "image_illegal_extension":  "Extension '{}' is not allowed." ,

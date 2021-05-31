@@ -36,3 +36,6 @@
 10. IMPORTANT: Make sure all contraints are named when creating migrations. (Set your own constraint names or set conventions in db.py)
 Good to define own names to standardize across all different databases.
 
+# OAuth Github
+1. Go to settings -> Developer settings -> OAuth Apps -> Create new OAuth App. Set callback to `http://localhost:5000/login/github/authorized`.
+2. Copy client id and client secret.

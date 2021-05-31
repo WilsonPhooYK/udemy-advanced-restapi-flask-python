@@ -1,6 +1,6 @@
 from flask import request, url_for
 from dataclasses import dataclass
-from typing import TypedDict
+from typing import TypedDict, Union
 from requests import Response
 from libs.mailgun import Mailgun
 from models.confirmation import ConfirmationModel
@@ -28,8 +28,8 @@ class UserModel(Model):
     # Must have id to authenticate
     id: int = db.Column(db.Integer, primary_key=True)
     username: str = db.Column(db.String(80), nullable=False, unique=True)
-    password: str = db.Column(db.String(80), nullable=False)
-    email: str = db.Column(db.String(80), nullable=False, unique=True)
+    password: Union[str, None] = db.Column(db.String(80))
+    email: str = db.Column(db.String(80), unique=True)
 
     confirmation = db.relationship(
         # all, delete-orphan - Delete all confirmation related to use
