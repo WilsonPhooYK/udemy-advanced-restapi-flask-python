@@ -29,5 +29,16 @@
     "user_not_confirmed": "You have not confirmed registration, please check your email <{}>.",
     "user_error_creating": "Internal server error. Failed to create user.",
     "user_registered": "Account created successfully, an email with an activation link has been sent to your email address, please check.",
-    "user_admin_required": "Admin privilege required."
+    "user_admin_required": "Admin privilege required.",
+
+    "image_uploaded": "Image '{}' uploaded.",
+    "image_illegal_extension":  "Extension '{}' is not allowed." ,
+    "image_illegal_file_name": "Illegal filename '{}' requested.",
+    "image_not_found": "Image '{}' not found.",
+    "image_deleted": "Image '{}' deleted.",
+    "image_delete_failed": "Internal server error! Failed to delete images",
+
+    "avatar_delete_failed": "Internal server error! Failed to delete avatar.",
+    "avatar_uploaded": "Avatar '{}' uploaded.",
+    "avatar_not_found": "Avatar not found."
   }

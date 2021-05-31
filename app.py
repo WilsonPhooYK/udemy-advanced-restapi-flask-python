@@ -1,11 +1,13 @@
 from blacklist import BLACKLIST
-import os
+# import os
 from typing import Any, cast
 
 from flask import Flask, jsonify
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from marshmallow import ValidationError
+from flask_uploads import configure_uploads, patch_request_class
+from dotenv import load_dotenv
 
 from ma import ma
 from db import db
@@ -20,18 +22,32 @@ from resources.user import (
 from resources.item import Item, ItemList
 from resources.store import Store, StoreList
 from resources.confirmation import Confirmation, ConfirmationByUser
+from resources.image import ImageUpload, Image, AvatarUpload, Avatar
+from libs.image_helper import IMAGE_SET
 
 app = Flask(__name__)
+
+# Load env file
+load_dotenv(".env", verbose=True)
+# load the app using default config
+app.config.from_object("default_config")
+# Reload config again if .env is different
+app.config.from_envvar("APPLICATION_SETTINGS")
+
+# Max 10mb, restrict max upload size
+patch_request_class(app, 10 * 1024 * 1024)
+configure_uploads(app, IMAGE_SET)
+
 # db at root foler
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
-    "DATABASE_URI", os.environ.get("DEV_DATABASE_URI")
-)
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-# Will raise 400 instead of 500 for flask errors
-app.config["PROPAGATE_EXCEPTIONS"] = True
-app.config["JWT_BLACKLIST_ENABLED"] = True
-app.config["JWT_BLACKLIST_TOKEN_CHECKS"] = ["access", "refresh"]
-app.secret_key = os.environ.get("APP_SECRET_KEY")
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+#     "DATABASE_URI", os.environ.get("DEV_DATABASE_URI")
+# )
+# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+# # Will raise 400 instead of 500 for flask errors
+# app.config["PROPAGATE_EXCEPTIONS"] = True
+# app.config["JWT_BLACKLIST_ENABLED"] = True
+# app.config["JWT_BLACKLIST_TOKEN_CHECKS"] = ["access", "refresh"]
+# app.secret_key = os.environ.get("APP_SECRET_KEY")
 api = Api(app)
 
 # app.config['JWT_AUTH_URL_RULE'] = '/login'
@@ -163,6 +179,10 @@ api.add_resource(UserLogout, "/logout")
 # api.add_resource(UserConfirm, "/user_confirm/<int:user_id>")
 api.add_resource(Confirmation, "/user_confirmation/<string:confirmation_id>")
 api.add_resource(ConfirmationByUser, "/confirmation/user/<int:user_id>")
+api.add_resource(ImageUpload, "/upload/image")
+api.add_resource(Image, "/image/<string:filename>")
+api.add_resource(AvatarUpload, "/upload/avatar")
+api.add_resource(Avatar, "/avatar/<int:user_id>")
 
 if __name__ == "__main__":
     # Run method before first request into app
@@ -173,4 +193,4 @@ if __name__ == "__main__":
 
     db.init_app(app)
     ma.init_app(app)
-    app.run(port=5000, debug=True)
+    app.run(port=5000)
