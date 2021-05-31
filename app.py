@@ -5,6 +5,7 @@ from typing import Any, cast
 from flask import Flask, jsonify
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate
 from marshmallow import ValidationError
 from flask_uploads import configure_uploads, patch_request_class
 from dotenv import load_dotenv
@@ -55,6 +56,7 @@ api = Api(app)
 # app.config['JWT_AUTH_USERNAME_KEY'] = 'email'
 jwt = JWTManager(app)  # not creating /auth
 
+migrate = Migrate(app, db)
 
 @app.errorhandler(ValidationError)
 def handle_marshmallow_validation(err: Any) -> Any:  # except ValidationError as err
@@ -183,6 +185,9 @@ api.add_resource(ImageUpload, "/upload/image")
 api.add_resource(Image, "/image/<string:filename>")
 api.add_resource(AvatarUpload, "/upload/avatar")
 api.add_resource(Avatar, "/avatar/<int:user_id>")
+
+
+# db.init_app(app)
 
 if __name__ == "__main__":
     # Run method before first request into app
