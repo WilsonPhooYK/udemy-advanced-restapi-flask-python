@@ -33,6 +33,11 @@ class ItemModel(Model):
         return cls.query.filter_by(name=name).first()
 
     @classmethod
+    def find_by_id(cls, _id: int) -> "ItemModel":
+        # SELECT * FROM items WHERE id=_id LIMIT 1
+        return cls.query.filter_by(id=_id).first()
+
+    @classmethod
     def find_all(cls) -> list["ItemModel"]:
         return cls.query.all()
 
